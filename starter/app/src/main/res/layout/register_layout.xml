@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/signup_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_up"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:layout_marginBottom="32dp"
+
+        android:textColor="@color/colorAccent"
+        android:textSize="24sp"/>
+<!--
+    <TextView
+        android:id="@+id/email_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/email_text"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:textColor="@color/colorAccent"/>
+
+    <EditText
+        android:id="@+id/email_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:ems="10"
+        android:inputType="textEmailAddress"
+        style="@style/InputStyle" />
+
+    <TextView
+        android:id="@+id/full_name_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/fullname"
+        android:layout_marginTop="@dimen/margin_normal"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:textColor="@color/colorAccent"/>
+
+    <EditText
+        android:id="@+id/full_name_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:ems="10"
+        android:inputType="text"
+        style="@style/InputStyle" />
+
+    <TextView
+        android:id="@+id/password_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/password_text"
+        android:layout_marginTop="@dimen/margin_normal"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:textColor="@color/colorAccent"/>
+
+    <EditText
+        android:id="@+id/password_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:ems="10"
+        android:inputType="textPassword"
+        style="@style/InputStyle" />
+
+    <Button
+        android:id="@+id/button_next"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/fui_next_default"
+        android:layout_margin="@dimen/margin_normal"
+        android:background="@color/colorAccent"
+        android:textColor="@color/white"
+        />
+-->
+
+    <Button
+        android:id="@+id/google_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/padding_large"
+        android:paddingEnd="48dp"
+        android:text="@string/google"
+        android:layout_margin="@dimen/margin_normal"
+        android:drawableStart="@drawable/ic_google"
+        android:textAlignment="center"
+        android:background="@color/white"
+        android:textColor="@color/colorPrimary"/>
+
+
+
+    <Button
+        android:id="@+id/email_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/padding_large"
+        android:paddingEnd="48dp"
+        android:text="@string/email_text"
+        android:layout_margin="@dimen/margin_normal"
+        android:drawableStart="@drawable/ic_email"
+        android:textAlignment="center"
+        android:background="@color/white"
+        android:textColor="@color/colorPrimary"
+        />
+</LinearLayout>
