@@ -49,7 +49,9 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
 
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
 
-            sendNotification(geofencingEvent.triggeringGeofences)
+            for ( geofence in geofencingEvent.triggeringGeofences ) {
+                sendNotification(geofence)
+            }
 
         } else {
 
@@ -58,8 +60,8 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
         }
     }
 
-    private fun sendNotification(triggeringGeofences: List<Geofence>) {
-        val requestId = triggeringGeofences[0].requestId
+    private fun sendNotification(triggeringGeofence: Geofence) {
+        val requestId = triggeringGeofence.requestId
 
         val remindersLocalRepository: ReminderDataSource by inject()
 

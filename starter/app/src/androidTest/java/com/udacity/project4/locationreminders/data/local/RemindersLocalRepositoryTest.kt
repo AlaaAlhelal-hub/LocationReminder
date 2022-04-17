@@ -68,8 +68,9 @@ class RemindersLocalRepositoryTest {
 
     @Test
     fun retrievesNonExistentReminder() = runBlocking {
-        val result = dataSource.getReminder("non-stored-id")
+        val result : Result.Error = dataSource.getReminder("non-stored-id") as Result.Error
 
-        assertThat(result, instanceOf(Result.Error::class.java))
+        assertThat(result.message, `is`("Reminder not found!"))
+
     }
 }

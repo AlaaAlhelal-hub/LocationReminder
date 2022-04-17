@@ -1,15 +1,18 @@
 package com.udacity.project4
 
 import android.app.Application
+import android.view.View
+import androidx.lifecycle.Transformations.map
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.withDecorView
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.udacity.project4.locationreminders.RemindersActivity
@@ -32,13 +35,20 @@ import org.koin.dsl.module
 import org.koin.test.AutoCloseKoinTest
 import org.koin.test.get
 import com.udacity.project4.utils.EspressoIdlingResource
+import org.hamcrest.CoreMatchers
+import org.junit.Rule
+import org.koin.test.KoinTest
 
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 //END TO END test to black box test the app
 class RemindersActivityTest :
-    AutoCloseKoinTest() {// Extended Koin Test - embed autoclose @after method to close Koin after every test
+    KoinTest {// Extended Koin Test - embed autoclose @after method to close Koin after every test
+
+    @get:Rule
+    var activityScenarioRule = ActivityScenarioRule(RemindersActivity::class.java)
+    private lateinit var decorView: View
 
 
     private lateinit var repository: ReminderDataSource
@@ -50,6 +60,7 @@ class RemindersActivityTest :
      * As we use Koin as a Service Locator Library to develop our code, we'll also use Koin to test our code.
      * at this step we will initialize Koin related code to be able to use it in out testing.
      */
+
     @Before
     fun init() {
         stopKoin()//stop the original app koin
@@ -83,70 +94,80 @@ class RemindersActivityTest :
             repository.deleteAllReminders()
         }
 
+        activityScenarioRule.scenario.onActivity { activity ->
+            decorView = activity.window.decorView
+        }
+    }
+
+    @Before
+    fun registerIdlingResource() {
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
         IdlingRegistry.getInstance().register(dataBindingIdlingResource)
     }
-
-
-
-    @Test
-    fun end_To_End() {
-
-        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
-        dataBindingIdlingResource.monitorActivity(activityScenario)
-
-        onView(withId(R.id.noDataTextView)).check(matches(isDisplayed()))
-
-
-        //onView(withId(R.id.addReminderFAB)).check(matches(isDisplayed()))
-        //onView(withId(R.id.addReminderFAB)).check(matches(isClickable()))
-        onView(withId(R.id.addReminderFAB)).perform(click())
-
-        //onView(withId(R.id.saveReminder)).perform(click())
-
-        //onView(withId(R.id.reminderTitle)).check(matches(isDisplayed()))
-        //onView(withId(R.id.reminderTitle)).check(matches(isClickable()))
-        //onView(withId(R.id.reminderTitle)).check(matches(withHint("Reminder Title")))
-        //onView(withId(R.id.reminderTitle)).perform(typeText("Title 1"))
-
-        // checking if reminderDescription is visble, clickable and typing the text
-        onView(withId(R.id.reminderDescription)).check(matches(isDisplayed()))
-        //onView(withId(R.id.reminderDescription)).check(matches(isClickable()))
-        //onView(withId(R.id.reminderDescription)).check(matches(withHint("Description")))
-        onView(withId(R.id.reminderDescription)).perform(typeText("Description 1"))
-
-        onView(withText("Reminder Location")).check(matches(isDisplayed()))
-        onView(withText("Reminder Location")).check(matches(isClickable()))
-
-        onView(isRoot()).perform(ViewActions.closeSoftKeyboard())
-
-
-        viewModel.latitude.postValue(-14.2222)
-        viewModel.longitude.postValue(-11.4443)
-        viewModel.reminderSelectedLocationStr.postValue("random location")
-
-
-        onView(withId(R.id.saveReminder)).perform(click())
-        //onView(withText("Title 1")).check(matches(isDisplayed()))
-        //onView(withId(R.id.reminderssRecyclerView)).check(RecyclerViewItemCountAssertion(1))
-        //onView(withId(R.id.reminderssRecyclerView)).perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click()))
-
-       // onView(withText("Reminder Title")).check(matches(isDisplayed()))
-      //  onView(withText("Title 1")).check(matches(isDisplayed()))
-       //// onView(withText("Description")).check(matches(isDisplayed()))
-      //  onView(withText("Description 1")).check(matches(isDisplayed()))
-
-        onView(withId(com.google.android.material.R.id.snackbar_text))
-            .check(matches(withText(R.string.err_enter_title)))
-
-        activityScenario.close()
-    }
-
-
 
     @After
     fun tearDown() {
         IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
         IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
+    }
+
+    @Test
+    fun create_InvalidReminder_TitleError() = runBlocking  {
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        navigateToSaveReminderScreen()
+        onView(withId(R.id.reminderTitle)).check(matches(isDisplayed()))
+
+        onView(withId(R.id.saveReminder)).perform(click())
+        onView(withText(appContext.getString(R.string.err_enter_title))).check(matches(isDisplayed()))
+
+        activityScenario.close()
+    }
+
+
+    @Test
+    fun emptyScreen_Shown() = runBlocking {
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        onView(withId(R.id.noDataTextView)).check(matches(isDisplayed()))
+        activityScenario.close()
+    }
+
+    @Test
+    fun verify_createdReminder_validaData() = runBlocking {
+        val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
+        navigateToSaveReminderScreen()
+
+        onView(withId(R.id.selectLocation)).perform(click())
+        onView(withId(R.id.map_fragment)).perform(longClick())
+        onView(withId(R.id.save_button)).perform(click())
+
+        val reminderTitle = "New Title"
+        val reminderDesc = "Location Description"
+        Thread.sleep(2000)
+        onView(withId(R.id.reminderTitle)).perform(replaceText(reminderTitle))
+        onView(withId(R.id.reminderDescription)).perform(replaceText(reminderDesc))
+
+        onView(withId(R.id.saveReminder)).perform(click())
+
+        onView(withText(R.string.reminder_saved)).inRoot(
+            withDecorView(CoreMatchers.not(decorView))
+        ).check(matches(isDisplayed()))
+
+        onView(withText(reminderTitle)).check(matches(isDisplayed()))
+        onView(withText(reminderDesc)).check(matches(isDisplayed()))
+
+
+        activityScenario.close()
+    }
+
+
+    private fun navigateToSaveReminderScreen() {
+        onView(withId(R.id.addReminderFAB)).check(matches(isDisplayed()))
+        onView(withId(R.id.addReminderFAB)).perform(click())
     }
 }
