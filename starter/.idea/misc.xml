@@ -3,8 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/alalhelal/Desktop/udacity/LocationReminder/starter/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
+        <entry key="..\:/Users/alalhelal/Desktop/udacity/LocationReminder/starter/app/src/main/res/drawable/ic_add_location.xml" value="0.1" />
         <entry key="..\:/Users/alalhelal/Desktop/udacity/LocationReminder/starter/app/src/main/res/drawable/ic_email.xml" value="0.1" />
         <entry key="..\:/Users/alalhelal/Desktop/udacity/LocationReminder/starter/app/src/main/res/drawable/ic_google.xml" value="0.1" />
+        <entry key="..\:/Users/alalhelal/Desktop/udacity/LocationReminder/starter/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
+        <entry key="..\:/Users/alalhelal/Desktop/udacity/LocationReminder/starter/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.1" />
         <entry key="..\:/Users/alalhelal/Desktop/udacity/LocationReminder/starter/app/src/main/res/layout/activity_authentication.xml" value="0.11666666666666667" />
         <entry key="..\:/Users/alalhelal/Desktop/udacity/LocationReminder/starter/app/src/main/res/layout/activity_reminder_description.xml" value="0.1" />
         <entry key="..\:/Users/alalhelal/Desktop/udacity/LocationReminder/starter/app/src/main/res/layout/activity_reminders.xml" value="0.11666666666666667" />
