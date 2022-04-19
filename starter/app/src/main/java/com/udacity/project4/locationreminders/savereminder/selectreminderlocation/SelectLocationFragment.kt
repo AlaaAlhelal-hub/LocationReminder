@@ -53,8 +53,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     companion object {
         private const val REQUEST_TURN_DEVICE_LOCATION_ON = 1002
         private const val REQUEST_LOCATION_PERMISSION = 1
-        private const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
-        private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
         private const val ZOOM = 15
         private val defaultLocation = LatLng(-14.921499703661087, -40.209044831600515)
     }
@@ -137,8 +135,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         }
 
-        askPermissionAndMovetoCurrentLocation()
-
         setMapStyle(map)
         setMapLongClick(map)
         enableMyLocation()
@@ -217,24 +213,36 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         return ContextCompat.checkSelfPermission(
             requireContext(),
             Manifest.permission.ACCESS_FINE_LOCATION
-        ) === PackageManager.PERMISSION_GRANTED
+        ) == PackageManager.PERMISSION_GRANTED
+                &&
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
     }
-
-    private fun askPermissionAndMovetoCurrentLocation() {
-        if (foregroundAndBackgroundLocationPermissionApproved()) {
-            enableMyLocation()
-        } else {
-            requestForegroundAndBackgroundLocationPermissions()
-        }
-        return
-    }
-
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
         if (isPermissionGranted()) {
             updateUI()
             getDeviceLocation(true)
+        }else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            Snackbar.make(
+                requireActivity().findViewById(android.R.id.content),
+                R.string.location_required_error,
+                Snackbar.LENGTH_INDEFINITE
+            )
+                .setAction(android.R.string.ok) {
+                    requestPermissions(
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                        REQUEST_LOCATION_PERMISSION
+                    )
+                }.show()
+        } else {
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION_PERMISSION
+            )
         }
     }
 
@@ -246,7 +254,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if (requestCode == REQUEST_LOCATION_PERMISSION || requestCode == REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE) {
+        if (requestCode == REQUEST_LOCATION_PERMISSION ) {
             if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 map.isMyLocationEnabled = true
                 enableMyLocation()
@@ -344,43 +352,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 getDeviceLocation(false)
             }
         }
-    }
-
-
-
-    @TargetApi(29)
-    fun requestForegroundAndBackgroundLocationPermissions() {
-        if (foregroundAndBackgroundLocationPermissionApproved())
-            return
-        var permissionsArray = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-        val resultCode = when {
-            runningQOrLater -> {
-                permissionsArray += Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE
-            }
-            else -> REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
-        }
-        requestPermissions(permissionsArray, resultCode)
-
-    }
-
-
-    @TargetApi(29)
-    fun foregroundAndBackgroundLocationPermissionApproved(): Boolean {
-        val foregroundLocationApproved = (
-                PackageManager.PERMISSION_GRANTED ==
-                        ActivityCompat.checkSelfPermission(this.requireContext(),
-                            Manifest.permission.ACCESS_FINE_LOCATION))
-        val backgroundPermissionApproved =
-            if (runningQOrLater) {
-                PackageManager.PERMISSION_GRANTED ==
-                        ActivityCompat.checkSelfPermission(
-                            this.requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                        )
-            } else {
-                true
-            }
-        return foregroundLocationApproved && backgroundPermissionApproved
     }
 
     private fun setMapStyle(map: GoogleMap) {
